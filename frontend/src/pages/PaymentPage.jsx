@@ -10,7 +10,7 @@ export default function PaymentPage({ apiKey }){
   async function initiate(e){
     e.preventDefault();
     const idempotency = uuidv4();
-    const resp = await fetch(`${BASE_URL}payments/initiate`, {
+    const resp = await fetch(`${BASE_URL}/payments/initiate`, {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
