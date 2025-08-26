@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+const BASE_URL=import.meta.env.MODE==="development"?'http://localhost:4000/api' :'/api'
 
 export default function PaymentPage({ apiKey }){
   const [amount, setAmount] = useState(100);
@@ -9,7 +10,7 @@ export default function PaymentPage({ apiKey }){
   async function initiate(e){
     e.preventDefault();
     const idempotency = uuidv4();
-    const resp = await fetch('http://localhost:4000/api/payments/initiate', {
+    const resp = await fetch(`${BASE_URL}payments/initiate`, {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -34,7 +35,7 @@ export default function PaymentPage({ apiKey }){
 
   async function pollStatus(){
     if (!txn) return;
-    const resp = await fetch(`http://localhost:4000/api/payments/${txn.transactionId}`);
+    const resp = await fetch(`${BASE_URL}/payments/${txn.transactionId}`);
     const data = await resp.json();
     if (data.transaction) {
       setStatus(data.transaction.status);

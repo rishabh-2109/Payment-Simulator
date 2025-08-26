@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const path=require('path');
 const connectDB = require('./config/db');
 const merchantRoutes = require('./routes/merchant');
 const paymentRoutes = require('./routes/payments');
@@ -9,12 +10,16 @@ const apiKeyAuth = require('./middleware/auth');
 const cors = require('cors');
 
 const app = express();
+ __dirname=path.resolve();
+if(process.env.NODE_ENV!=="production"){
 app.use(cors());
+}
+
 app.use(bodyParser.json());
 
 createRedis(process.env.REDIS_URL);
 
-connectDB(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/payment_sim').catch(err => {
+connectDB(process.env.MONGO_URI).catch(err => {
   console.error('DB connection failed', err);
   process.exit(1);
 });
@@ -37,6 +42,14 @@ app.get('/simulate/pay/:txnId', async (req, res) => {
 app.use(apiKeyAuth); 
 app.use('/api/merchants', merchantRoutes);
 app.use('/api/payments', paymentRoutes);
+
+if(process.env.NODE_ENV==="production"){
+  app.use(express.static(path.join(__dirname,"../frontend/dist")));
+
+app.get("/*splat",(req,res)=>{
+  res.sendFile(path.join(__dirname,"../frontend/dist/index.html"));
+});
+}
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));

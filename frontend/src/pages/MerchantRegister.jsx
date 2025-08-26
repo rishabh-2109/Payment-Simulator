@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
+const BASE_URL=import.meta.env.MODE==="development"?'http://localhost:4000/api' :'/api';
+
 export default function MerchantRegister({ onCreated }){
   const [name, setName] = useState('');
   const [callback, setCallback] = useState('');
   const [merchant, setMerchant] = useState(null);
 
+
   async function submit(e){
     e.preventDefault();
-    const resp = await fetch('http://localhost:4000/api/merchants/register', {
+    const resp = await fetch(`${BASE_URL}/merchants/register`, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify({ name, callbackUrl: callback })
